@@ -1,0 +1,33 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+#GET     /                           controllers.Application.index()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+
+#spider
+GET      /tocompetitorItem                 controllers.spider.CompetitorItemC.toCompetitorItems()
+POST     /competitorItemsdataview          controllers.spider.CompetitorItemC.dataview()
+GET      /CompetitorItemsDownLoad          controllers.spider.CompetitorItemC.getExcel()
+POST     /getSingleProducts                controllers.spider.CompetitorItemC.getSingleProducts()
+GET      /retryBadPorducts                 controllers.spider.CompetitorItemC.retryBadPorducts()
+
+GET      /                                 controllers.spider.CompetitorC.toCompetitor()
+GET      /tocompetitor                     controllers.spider.CompetitorC.toCompetitor()
+POST     /competitordataview          	   controllers.spider.CompetitorC.dataview()
+POST     /competitorSave                      controllers.spider.CompetitorC.saveCompetitor()
+POST     /competitorUpdate                      controllers.spider.CompetitorC.updateCompetitor()
+POST     /competitorDelete                      controllers.spider.CompetitorC.deleteCompetitor()
+POST     /startspider                            controllers.spider.CompetitorC.startSpider2()
+GET      /CompetitorItemsDownLoadByStore                controllers.spider.CompetitorC.downloadBtStore()
+
+#plat
+GET      /toPlat                           controllers.spider.PlatC.toPlat()
+POST     /Platdataview          	   	   controllers.spider.PlatC.dataview()
+POST     /PlatSave                         controllers.spider.PlatC.savePlat()
+POST     /PlatUpdate                       controllers.spider.PlatC.updatePlat()
+POST     /PlatDelete                       controllers.spider.PlatC.deletePlat()

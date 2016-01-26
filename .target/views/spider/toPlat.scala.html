@@ -1,0 +1,279 @@
+
+@main {
+ <style type="text/css">
+        #fm{
+            margin:0;
+            padding:10px 30px;
+        }
+        .ftitle{
+            font-size:14px;
+            font-weight:bold;
+            padding:5px 0;
+            margin-bottom:10px;
+            border-bottom:1px solid #ccc;
+        }
+        .fitem{
+            margin-bottom:5px;
+        }
+        .fitem label{
+            display:inline-block;
+            width:80px;
+        }
+        .fitem input{
+            width:160px;
+        }
+    </style>
+    <script type="text/javascript">
+
+$(document).ready(function(){
+	 $(function(){
+		  var dg2=$('#dg2').datagrid({
+		  	  pagination:true,
+              rownumbers:true,
+              singleSelect:false,
+              remoteFilter: true,
+              striped: true, 
+			  
+              url: '/Platdataview',
+              saveUrl: '/PlatSave',
+              updateUrl: '/PlatUpdate',
+              destroyUrl: '/PlatDelete',
+			  
+              onSuccess: function(index, row){
+            	  msg_show("第"+(index+1)+"行,提示",row.msg);
+            	  $('#dg2').datagrid('reload');
+              }
+          });
+		  
+		  dg2.datagrid('enableFilter', [{
+				field:'xxid',
+				type:'textbox'
+			},{
+				field:'xxdictCode',
+				type:'textbox'
+			}]);
+     	
+     });
+     
+});
+function toPlatItem(){
+	window.location.href="/toPlatItem";
+}
+/*function start(){
+	var row= $('#dg2').edatagrid('getSelected');
+	$.post('/startspider',{id:row.id,brandName:row.brandName,startUrl:row.startUrl,platName:row.platName},function(data) {
+				  msg_show("成功",data);
+            	  $('#dlg4').dialog('close');
+		});
+}*/
+/*function DownLoadByStore(obj){
+	var routes=$('#dg2').edatagrid('getSelections');
+	var ids=getSelectedIds();
+	var brands=getSelectedBrands();
+	var urls=getSelectedUrls();
+	var plat=getSelectedPlats();
+	if(routes){
+		for(var i=0; i<routes.length; i++){
+		    var row= routes[i];
+			//$.get('/PlatItemsDownLoadByStore',{id:row.id,brandName:row.brandName,startUrl:row.startUrl,platName:row.platName});
+			$(obj).attr('href','/PlatItemsDownLoadByStore?id='+ids+'&brandName='+brands+'&startUrl='+urls+'&platName='+plat+'');
+		}
+	}
+	
+}*/
+
+/*function multiStart(){		 
+	var id = getSelectedIds();
+	$.post('/startspider',{'id':id},function(data) {
+				  msg_show("成功",data);
+            	  $('#dlg4').dialog('close');
+		});
+}*/
+
+function getSelectedIds() {
+	
+	var routes=$('#dg2').edatagrid('getSelections');
+	var ids="";
+	if(routes){
+		for(var i=0; i<routes.length; i++){
+		    var row=routes[i];
+		    ids+=""+row.id+",";
+		}
+	}
+	alert(ids);
+	return ids.substring(0,ids.lastIndexOf(","));
+}
+
+var url;
+
+function newPlat(){
+    $('#dlg').dialog('open').dialog('setTitle','新增平台');
+    $('#fm').form('clear');
+    url = '/PlatSave';
+}
+function editPlat(){
+    var row = $('#dg2').datagrid('getSelected');
+    if (row){
+        $('#dlg').dialog('open').dialog('setTitle','修改平台');
+        $('#fm').form('load',row);
+        url = '/PlatUpdate?id='+row.id;
+        $("#hid").val(row.id);
+    }
+}
+function editPass(){
+	var row = $('#dg').datagrid('getSelected');
+    if (row){
+        $('#dlg3').dialog('open').dialog('setTitle','修改');
+        $('#fm_pass').form('clear');
+        $('#fm_pass').form('load',row);
+        url = '/updatePassword';
+        $("#hid").val(row.id);
+        $("#pass_userName").attr("readonly","readonly");;
+    }
+}
+function savePass(){
+	var newpass = hex_md5($("#passnew1").val()).toUpperCase();
+	$("#newpass").val(newpass);
+	savePlat($("#fm_pass"),'pass');
+}
+function savePlat(fm,flag){
+	
+	fm.form('submit',{
+        url: url,
+        onSubmit: function(){
+            return $(this).form('validate');
+            $('#dg2').datagrid('reload');
+        },
+        success: function(result){
+            var result = eval('('+result+')');
+            if (result.success){
+            	msg_show("成功",result.msg);
+            	  $('#dlg').dialog('close'); 
+            	  $('#dlg2').dialog('close'); 
+            	  $('#dlg3').dialog('close'); 
+                  $('#dg').datagrid('reload'); 
+            } else {
+            	msg_show("失败",result.msg);
+            }
+        }
+    });
+    $('#dg2').datagrid('reload');
+}
+function destroyPlat(){
+    var row = $('#dg2').datagrid('getSelected');
+    if (row){
+        $.messager.confirm('确认','确定删除吗?',function(r){
+            if (r){
+                $.post('/PlatDelete',{id:row.id},function(result){
+                	 if (result.success){
+                     	msg_show("成功",result.msg);
+                        $('#dg').datagrid('reload'); 
+                     } else {
+                     	msg_show("失败",result.msg);
+                     }
+                },'json');
+            }
+        });
+    }
+    $('#dg2').datagrid('reload');
+}
+//-->
+</script>
+	<div>
+		<ul class="breadcrumb">
+			<li>
+				<a href="javascript:window.parent.location.reload();"><i class="icon-th"></i>主页</a> <span class="divider">/</span>
+			</li>
+			<li>
+				<a href="javascript:window.location.reload();">店铺配置</a>
+			</li>
+		</ul>
+	</div>
+    <div class="easyui-tabs" style="width: 1340px;height: 500px;">
+        
+		<div title="店铺配置" data-options="iconCls:'icon-add',closable:false" style="padding:10px">     
+			<table id="dg2" title="" style="width:1310px;height:450px" 
+				toolbar="#toolbar2" pagination="true" idField="id"
+				rownumbers="true" fitColumns="true" singleSelect="true">
+				<thead>
+					<tr>
+
+						<th field="id" width="10" hidden="true">id</th>
+						<th field="platName" width="20" editor="text">平台名称</th>
+				
+					</tr>
+				</thead>
+			</table>
+			<div id="toolbar2">
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newPlat()">新增</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="editPlat()">修改</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="destroyPlat()">删除</a>
+			</div>
+			
+			<!-- new -->
+			<div id="dlg" class="easyui-dialog" style="width:500px;height:440px;padding:5px 10px"
+					closed="true" buttons="#dlg-buttons">
+					
+				<div class="ftitle">新建平台</div>
+					<form id="fm" method="post" novalidate>
+						<div class="fitem">
+							<label>平台名称:</label>
+							<input type="text" name="platName" class="easyui-validatebox" />
+						</div>
+						<div class="fitem">
+							<label>单款表达式:</label>
+							<input type="text" name="areaRegular" class="easyui-validatebox" />
+						</div>
+						<div class="fitem">
+							<label>url表达式:</label>
+							<input type="text" name="urlRegular" class="easyui-validatebox" />
+						</div>
+						<div class="fitem">
+							<label>图片表达式:</label>
+							<input type="text" name="imgRegular" class="easyui-validatebox" />
+						</div>
+						<div class="fitem">
+							<label>价格表达式:</label>
+							<input type="text" name="priceRegular" class="easyui-validatebox" />
+						</div>
+						<div class="fitem">
+							<label>总销量表达式:</label>
+							<input type="text" name="volumeRegular" class="easyui-validatebox" />
+						</div>
+						<div class="fitem">
+							<label>评价表达式:</label>
+							<input type="text" name="ratesRegular" class="easyui-validatebox" />
+						</div>
+						<div class="fitem">
+							<label>吊牌价类名:</label>
+							<input type="text" name="dropPriceClass" class="easyui-validatebox" />
+						</div>
+						<div class="fitem">
+							<label>月销量类名:</label>
+							<input type="text" name="monthVolumeClass" class="easyui-validatebox" />
+						</div>
+						<div class="fitem">
+							<label>评价类名:</label>
+							<input type="text" name="ratesClass" class="easyui-validatebox" />
+						</div>
+						<div class="fitem">
+							<label>属性类名:</label>
+							<input type="text" name="attrListClass" class="easyui-validatebox" />
+						</div>
+						<input type="hidden" id="hid" name="id" value=""/>
+					</form>
+					
+			</div>
+			<div id="dlg-buttons">
+				<a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="savePlat($('#fm'),'save_user')" style="width:90px">保存</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px">取消</a>
+			</div>
+	   
+		</div>
+		
+		
+   
+    </div>
+}
+
+            

@@ -1,0 +1,136 @@
+
+@main {
+ <style type="text/css">
+        #fm{
+            margin:0;
+            padding:10px 30px;
+        }
+        .ftitle{
+            font-size:14px;
+            font-weight:bold;
+            padding:5px 0;
+            margin-bottom:10px;
+            border-bottom:1px solid #ccc;
+        }
+        .fitem{
+            margin-bottom:5px;
+        }
+        .fitem label{
+            display:inline-block;
+            width:80px;
+        }
+        .fitem input{
+            width:160px;
+        }
+    </style>
+    <script type="text/javascript">
+
+$(document).ready(function(){
+	 $(function(){
+		  var dg2=$('#dg2').edatagrid({
+		  	  pagination:true,
+              rownumbers:true,
+              singleSelect:false,
+              remoteFilter: true,
+              striped: true, 
+			  
+              url: '/competitorItemsdataview',
+			  
+              onSuccess: function(index, row){
+            	  msg_show("第"+(index+1)+"行,提示",row.msg);
+            	  $('#dg2').datagrid('reload');
+              }
+          });
+		  
+		  dg2.datagrid('enableFilter', [{
+				field:'xxid',
+				type:'textbox'
+			},{
+				field:'xxdictCode',
+				type:'textbox'
+			}]);
+     	
+     });
+});
+
+
+function toCompetitor(){
+	window.location.href="/tocompetitor";
+}
+function downLoad(){
+	$.get('/CompetitorItemsDownLoad');
+}
+
+function retryBads(){		 
+	$.get('/retryBadPorducts');
+}
+function multiStart(){		 
+	var nums = getSelectedIds();
+	$.post('/getSingleProducts',{'name':nums});
+}
+
+function getSelectedIds() {
+	
+	var routes=$('#dg2').edatagrid('getSelections');
+	var ids="";
+	if(routes){
+		for(var i=0; i<routes.length; i++){
+		    var row=routes[i];
+		    ids+=""+row.itemName+",";
+		}
+	}
+	return ids.substring(0,ids.lastIndexOf(","));
+}
+//-->
+</script>
+	<div>
+		<ul class="breadcrumb">
+			<li>
+				<a href="javascript:window.parent.location.reload();"><i class="icon-th"></i>主页</a> <span class="divider">/</span>
+			</li>
+			<li>
+				<a href="javascript:window.location.reload();">爬虫结果</a>
+			</li>
+		</ul>
+	</div>
+    <div class="easyui-tabs" style="width: 1340px;height: 500px;">
+        
+		<div title="爬虫结果" data-options="iconCls:'icon-add',closable:false" style="padding:10px">     
+			<table id="dg2" title="" style="width:1310px;height:450px" 
+				toolbar="#toolbar2" pagination="true" idField="brandId"
+				rownumbers="true" fitColumns="true" singleSelect="true">
+				<thead>
+					<tr>
+
+						<th field="id" width="50" hidden="true">id</th>
+						<th field="platName" width="50" >品牌名称</th>
+						<th field="brandName" width="50" >品牌名称</th>
+						<th field="itemName" width="50" >款名称</th>
+						<th field="itemUrl" width="50" hidden="true">详情页Url</th>
+						<th field="imgUrl"  width="50" hidden="true">图片链接</th>
+						<th field="dropPrice"  width="50">吊牌价</th>
+						<th field="itemPrice" width="50" >销售价</th>
+						<th field="totalVolume" width="50" >总销量</th>
+						<th field="monthVolume" width="50" >月销量</th>
+						<th field="rates" width="50" >评论数</th>
+						<th field="season" width="50" >产品季</th>
+						<th field="productId" width="50" >货号</th>
+						<th field="createTime" width="50" >获取时间</th>
+						<th field="itemDes" width="500" >属性</th>
+						
+					</tr>
+				</thead>
+			</table>
+			<div id="toolbar2">
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="toCompetitor()">店铺配置</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="multiStart()">抓取选定款</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="retryBads()">抓取失败款</a>
+				<a href="/CompetitorItemsDownLoad" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="downLoad()">全部导出</a>
+			</div>
+	   
+		</div>
+   
+    </div>
+}
+
+            

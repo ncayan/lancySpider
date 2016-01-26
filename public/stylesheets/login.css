@@ -1,0 +1,8 @@
+html,body{background:#1371a7 url(../images/login-bg.jpg) no-repeat center center;}
+.login{width:450px;height:250px;border:1px solid #939393;overflow:hidden;background-color:#EFEFEF;}
+.login{position:absolute;left:50%;top:50%;margin:-150px 0 0 -250px;}
+.login .login-title{width:100%;height:40px;text-indent:45px;margin-bottom:0px;font:700 18px/40px "Î¢ÈíÑÅºÚ";color:#666;border-bottom:1px solid #939393;background:#FAFAFA url(../images/login24.png) no-repeat 10px center;}
+.login .login-input{width:100%;margin-top:0px;}
+.login .login-input td{padding:2px 5px;height:25px;line-height:25px;}
+.login .login-input .loginleft{width:120px;text-align:right;font:"Î¢ÈíÑÅºÚ";color:#000000;}
+.login .login-input .txt{width:200px;}

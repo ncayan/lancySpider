@@ -1,0 +1,198 @@
+
+@main {
+ <style type="text/css">
+        #fm{
+            margin:0;
+            padding:10px 30px;
+        }
+        .ftitle{
+            font-size:14px;
+            font-weight:bold;
+            padding:5px 0;
+            margin-bottom:10px;
+            border-bottom:1px solid #ccc;
+        }
+        .fitem{
+            margin-bottom:5px;
+        }
+        .fitem label{
+            display:inline-block;
+            width:80px;
+        }
+        .fitem input{
+            width:160px;
+        }
+    </style>
+    <script type="text/javascript">
+
+$(document).ready(function(){
+	 $(function(){
+		  var dg2=$('#dg2').edatagrid({
+		  	  pagination:true,
+              rownumbers:true,
+              singleSelect:false,
+              remoteFilter: true,
+              striped: true, 
+			  
+              url: '/competitordataview',
+              saveUrl: '/competitorSave',
+              updateUrl: '/competitorUpdate',
+              destroyUrl: '/competitorDelete',
+			  
+              onSuccess: function(index, row){
+            	  msg_show("第"+(index+1)+"行,提示",row.msg);
+            	  $('#dg2').datagrid('reload');
+              }
+          });
+		  
+		  dg2.datagrid('enableFilter', [{
+				field:'xxid',
+				type:'textbox'
+			},{
+				field:'xxdictCode',
+				type:'textbox'
+			}]);
+     	
+     });
+     
+});
+function toCompetitorItem(){
+	window.location.href="/tocompetitorItem";
+}
+
+function toPlat(){
+	window.location.href="/toPlat";
+}
+function start(){
+	var row= $('#dg2').edatagrid('getSelected');
+	$.post('/startspider',{id:row.id,brandName:row.brandName,startUrl:row.startUrl,platName:row.platName},function(data) {
+				  msg_show("成功",data);
+            	  $('#dlg4').dialog('close');
+		});
+}
+function DownLoadByStore(obj){
+	var routes=$('#dg2').edatagrid('getSelections');
+	var ids=getSelectedIds();
+	var brands=getSelectedBrands();
+	var urls=getSelectedUrls();
+	var plat=getSelectedPlats();
+	if(routes){
+		for(var i=0; i<routes.length; i++){
+		    var row= routes[i];
+			//$.get('/CompetitorItemsDownLoadByStore',{id:row.id,brandName:row.brandName,startUrl:row.startUrl,platName:row.platName});
+			$(obj).attr('href','/CompetitorItemsDownLoadByStore?id='+ids+'&brandName='+brands+'&startUrl='+urls+'&platName='+plat+'');
+		}
+	}
+	
+}
+
+function multiStart(){		 
+	var id = getSelectedIds();
+	$.post('/startspider',{'id':id},function(data) {
+				  msg_show("成功",data);
+            	  $('#dlg4').dialog('close');
+		});
+}
+
+function getSelectedIds() {
+	
+	var routes=$('#dg2').edatagrid('getSelections');
+	var ids="";
+	if(routes){
+		for(var i=0; i<routes.length; i++){
+		    var row=routes[i];
+		    ids+=""+row.id+",";
+		}
+	}
+	alert(ids);
+	return ids.substring(0,ids.lastIndexOf(","));
+}
+
+function getSelectedBrands() {
+	
+	var routes=$('#dg2').edatagrid('getSelections');
+	var ids="";
+	if(routes){
+		for(var i=0; i<routes.length; i++){
+		    var row=routes[i];
+		    ids+=""+row.brandName+",";
+		}
+	}
+	alert(ids);
+	return ids.substring(0,ids.lastIndexOf(","));
+}
+
+function getSelectedUrls() {
+	
+	var routes=$('#dg2').edatagrid('getSelections');
+	var ids="";
+	if(routes){
+		for(var i=0; i<routes.length; i++){
+		    var row=routes[i];
+		    ids+=""+row.startUrl+",";
+		}
+	}
+	alert(ids);
+	return ids.substring(0,ids.lastIndexOf(","));
+}
+
+function getSelectedPlats() {
+	
+	var routes=$('#dg2').edatagrid('getSelections');
+	var ids="";
+	if(routes){
+		for(var i=0; i<routes.length; i++){
+		    var row=routes[i];
+		    ids+=""+row.platName+",";
+		}
+	}
+	alert(ids);
+	return ids.substring(0,ids.lastIndexOf(","));
+}
+//-->
+</script>
+	<div>
+		<ul class="breadcrumb">
+			<li>
+				<a href="javascript:window.parent.location.reload();"><i class="icon-th"></i>主页</a> <span class="divider">/</span>
+			</li>
+			<li>
+				<a href="javascript:window.location.reload();">店铺配置</a>
+			</li>
+		</ul>
+	</div>
+    <div class="easyui-tabs" style="width: 1340px;height: 500px;">
+        
+		<div title="店铺配置" data-options="iconCls:'icon-add',closable:false" style="padding:10px">     
+			<table id="dg2" title="" style="width:1310px;height:450px" 
+				toolbar="#toolbar2" pagination="true" idField="id"
+				rownumbers="true" fitColumns="true" singleSelect="true">
+				<thead>
+					<tr>
+
+						<th field="id" width="10" hidden="true">id</th>
+						<th field="platName" width="20" editor="text">平台名称</th>
+						<th field="brandName" width="20" editor="text">品牌名称</th>
+						<th field="startUrl" width="500" editor="text">起始Url</th>
+
+						
+					</tr>
+				</thead>
+			</table>
+			<div id="toolbar2">
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="javascript:$('#dg2').edatagrid('addRow')">新增</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="javascript:$('#dg2').edatagrid('destroyRow')">删除</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-save" plain="true" onclick="javascript:$('#dg2').edatagrid('saveRow')">保存</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="javascript:$('#dg2').edatagrid('cancelRow')">取消</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="toCompetitorItem()">查看结果</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="toPlat()">查看平台</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="multiStart()">抓取所选店铺</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-undo" plain="true" onclick="DownLoadByStore(this)">导出所选店铺</a>
+			</div>
+	   
+		</div>
+   
+    </div>
+}
+
+            
